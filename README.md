@@ -14,16 +14,18 @@ Secret Manager
 CloudWatch
 
 📁 프로젝트 구조
+
+![image](https://github.com/user-attachments/assets/9bdcc542-530f-4797-9d7b-a85991f4a3f5)
+
 terraform-project/
-│
-├── provider.tf            # AWS Provider 설정
-├── vpc.tf                 # VPC, Subnet, IGW, NATGW 구성
-├── security_groups.tf     # 보안 그룹
-├── bastion.tf             # EC2: Bastion Host
-├── ecr.tf                 # ECR Repository
-├── ecs.tf                 # ECS Cluster & Task & Service
-├── alb.tf                 # ALB (internal), NLB (external)
-├── rds.tf                 # RDS MySQL
-├── secrets.tf             # Secrets Manager 구성
-└── variables.tf           # 변수 선언
+provider.tf            # AWS Provider 설정
+vpc.tf                 # VPC, Subnet, IGW, NATGW 구성
+security_groups.tf     # 보안 그룹
+bastion.tf             # EC2: Bastion Host
+ecr.tf                 # ECR Repository
+ecs.tf                 # ECS Cluster & Task & Service
+alb.tf                 # ALB (internal), NLB (external)
+rds.tf                 # RDS MySQL
+secrets.tf             # Secrets Manager 구성
+variables.tf           # 변수 선언
 
