@@ -17,3 +17,9 @@ App VPC (NAT GW + Private Subnet + DB Subnet)
 ### 📁 프로젝트 구조  
 ![image](https://github.com/user-attachments/assets/9bdcc542-530f-4797-9d7b-a85991f4a3f5)
 
+### ecs.tf 파일 구조
+ECS 클러스터 생성  
+IAM 역할 (Task Execution Role)  
+Task Definition (Fargate 기반)  
+ECS Service 구성 (ALB 연동 포함)  
+ALB 및 Target Group 생성 (Internal ALB)  
