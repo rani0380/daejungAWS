@@ -15,6 +15,7 @@ CloudWatch
 
 📁 프로젝트 구조
 terraform-project/
+│
 ├── provider.tf            # AWS Provider 설정
 ├── vpc.tf                 # VPC, Subnet, IGW, NATGW 구성
 ├── security_groups.tf     # 보안 그룹
@@ -25,3 +26,4 @@ terraform-project/
 ├── rds.tf                 # RDS MySQL
 ├── secrets.tf             # Secrets Manager 구성
 └── variables.tf           # 변수 선언
+
