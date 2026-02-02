@@ -14,7 +14,7 @@ AWS 기반 인프라 설계 및 서비스 구축 문제를 풀이·정리한 포
 
 ## 🧱 풀이 구성 체계
 
-### 01️⃣ Network
+### 1️⃣ Network
 - VPC, IGW, Route Table
 - Security Group
 - Network Firewall, GWLBe 라우팅
@@ -23,7 +23,7 @@ AWS 기반 인프라 설계 및 서비스 구축 문제를 풀이·정리한 포
 
 ---
 
-### 02️⃣ Compute
+### 2️⃣ Compute
 - EC2 인스턴스 구성
 - Bastion Host 설계 및 접근 제어
 
@@ -31,7 +31,7 @@ AWS 기반 인프라 설계 및 서비스 구축 문제를 풀이·정리한 포
 
 ---
 
-### 03️⃣ Container & Application
+### 3️⃣ Container & Application
 - Docker 환경 구성
 - Golang 애플리케이션 컨테이너화
 - ECR 이미지 관리
@@ -42,7 +42,7 @@ AWS 기반 인프라 설계 및 서비스 구축 문제를 풀이·정리한 포
 
 ---
 
-### 04️⃣ Monitoring
+### 4️⃣ Monitoring
 - CloudWatch Logs
 - ECS Task 로그 분석
 
