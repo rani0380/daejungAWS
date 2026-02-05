@@ -1,39 +1,23 @@
 
-1️⃣ 전체 아키텍처 개요
+## 1️⃣ 전체 아키텍처 개요
 🔹 핵심 구성
 
 ECS on EC2
-
 인스턴스 타입: t3.medium (대회 조건 강제)
-
 Auto Scaling Group 기반 고가용성
-
 Application Load Balancer
-
 단일 엔드포인트
-
 경로 기반 라우팅
-
 RDS MySQL
-
 MySQL 8.0
-
 Multi-AZ
-
 db.t3.micro, gp3
-
 DynamoDB
-
 PAY_PER_REQUEST
-
 product 테이블 단일 구성
-
 CloudWatch Logs
-
 ECS 서비스별 로그 그룹 분리
-
 (옵션) AWS WAF
-
 403 / 404 구분 처리용 보조 정책
 
 ````2️⃣ 디렉토리 구조 역할 정리
