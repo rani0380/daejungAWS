@@ -36,7 +36,7 @@ ECS 서비스별 로그 그룹 분리
 
 403 / 404 구분 처리용 보조 정책
 
-2️⃣ 디렉토리 구조 역할 정리
+````2️⃣ 디렉토리 구조 역할 정리
 skills-task3/
 ├─ versions.tf        # Terraform / Provider 버전 고정
 ├─ providers.tf       # AWS 리전 설정
