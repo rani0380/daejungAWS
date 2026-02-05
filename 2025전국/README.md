@@ -1,41 +1,78 @@
+# Skills Task 3 - 기능경기대회 클라우드컴퓨팅 직종
 
-## 1️⃣ 전체 아키텍처 개요
-🔹 핵심 구성
+## 아키텍처 개요
+- **ECS on EC2**: t3.medium 인스턴스 기반 컨테이너 서비스
+- **ALB**: 경로 기반 라우팅 (/v1/user, /v1/product, /v1/stress)
+- **RDS MySQL**: Multi-AZ, db.t3.micro
+- **DynamoDB**: PAY_PER_REQUEST 모드
+- **WAF**: 403/404 구분 처리
 
-ECS on EC2
-인스턴스 타입: t3.medium (대회 조건 강제)
-Auto Scaling Group 기반 고가용성
-Application Load Balancer
-단일 엔드포인트
-경로 기반 라우팅
-RDS MySQL
-MySQL 8.0
-Multi-AZ
-db.t3.micro, gp3
-DynamoDB
-PAY_PER_REQUEST
-product 테이블 단일 구성
-CloudWatch Logs
-ECS 서비스별 로그 그룹 분리
-(옵션) AWS WAF
-403 / 404 구분 처리용 보조 정책
+## 배포 순서
 
-````2️⃣ 디렉토리 구조 역할 정리
-skills-task3/
-├─ versions.tf        # Terraform / Provider 버전 고정
-├─ providers.tf       # AWS 리전 설정
-├─ variables.tf       # 대회 조건을 반영한 변수 정의
-├─ locals.tf          # 태그, 로그 그룹, 공통 포트
-├─ vpc.tf             # VPC, Subnet, Routing
-├─ security.tf        # ALB / ECS / RDS 보안그룹
-├─ iam.tf             # ECS Instance / Task IAM 역할
-├─ ecr.tf             # user / product / stress ECR
-├─ ecs_cluster_ec2.tf # ECS Cluster + ASG + Capacity Provider
-├─ ecs_tasks.tf       # Task Definition + Log Group
-├─ ecs_services.tf    # ECS Service (user/product/stress)
-├─ alb.tf             # ALB + Target Group + Listener Rule
-├─ rds.tf             # RDS MySQL Multi-AZ
-├─ dynamodb.tf        # DynamoDB Table
-├─ waf.tf             # (옵션) WAF 403 제어
-├─ monitoring.tf      # (선택) CloudWatch Alarm
-└─ outputs.tf         # 배포 결과 출력
+### 1. Terraform 초기화
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+### 2. ECR 이미지 Push (필수)
+```bash
+# AWS CLI 로그인
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com
+
+# 각 서비스별 이미지 빌드 및 푸시
+docker build -t skills-task3-competition-user ./user-service
+docker tag skills-task3-competition-user:latest <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-user:latest
+docker push <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-user:latest
+
+docker build -t skills-task3-competition-product ./product-service
+docker tag skills-task3-competition-product:latest <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-product:latest
+docker push <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-product:latest
+
+docker build -t skills-task3-competition-stress ./stress-service
+docker tag skills-task3-competition-stress:latest <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-stress:latest
+docker push <account-id>.dkr.ecr.ap-northeast-2.amazonaws.com/skills-task3-competition-stress:latest
+```
+
+### 3. 서비스 확인
+```bash
+# ALB DNS 확인
+terraform output alb_dns_name
+
+# 서비스 테스트
+curl http://<alb-dns>/v1/user/healthcheck
+curl http://<alb-dns>/v1/product/healthcheck
+curl http://<alb-dns>/v1/stress/healthcheck
+```
+
+## 주요 특징
+
+### 네트워크 설계
+- **Public Subnet**: ALB, ECS EC2 인스턴스
+- **DB Subnet**: RDS 전용
+- **NAT Gateway 미사용**: 비용 절감 및 안정성
+
+### 보안 설정
+- **Security Groups**: 최소 권한 원칙
+- **IAM Roles**: 서비스별 역할 분리
+- **WAF**: API 경로별 세밀한 제어
+
+### 모니터링
+- **CloudWatch Alarms**: ALB, ECS, RDS 핵심 지표
+- **Log Groups**: 서비스별 로그 분리
+- **Container Insights**: ECS 클러스터 모니터링
+
+## 채점 포인트 대응
+- ✅ 인스턴스 타입: t3.medium 고정
+- ✅ RDS: Multi-AZ, db.t3.micro
+- ✅ 고가용성: ASG 최소 2대
+- ✅ 경로 기반 라우팅: /v1/* 패턴
+- ✅ 403/404 구분: WAF + ALB 조합
+- ✅ 모니터링: 핵심 지표 알람 설정
+
+## 주의사항
+1. **ECR 이미지 Push 필수**: 미배포 시 ECS Task 실행 실패
+2. **Health Check 엔드포인트**: 각 서비스에 `/healthcheck` 구현 필요
+3. **DB 연결 정보**: RDS 엔드포인트 및 DynamoDB 테이블명 확인
+4. **비용 관리**: 테스트 후 리소스 정리 (`terraform destroy`)
