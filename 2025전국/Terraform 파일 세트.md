@@ -14,21 +14,25 @@
 
 ```
 skills-task3/
-  providers.tf
-  versions.tf
-  variables.tf
-  locals.tf
-  vpc.tf
-  security.tf
-  iam.tf
-  ecr.tf
-  ecs_cluster_ec2.tf
-  ecs_tasks.tf
-  alb.tf
-  rds.tf
-  dynamodb.tf
-  waf.tf
-  outputs.tf
+├── versions.tf        # Terraform/Provider 버전
+├── providers.tf       # AWS Provider 설정
+├── variables.tf       # 대회 조건 변수
+├── locals.tf          # 공통 태그/값
+├── vpc.tf             # VPC/Subnet/Routing
+├── security.tf        # Security Groups
+├── iam.tf             # IAM 역할/정책
+├── ecr.tf             # ECR 리포지토리
+├── ecs_cluster_ec2.tf # ECS 클러스터/ASG
+├── ecs_tasks.tf       # Task Definition
+├── ecs_services.tf    # ECS 서비스
+├── alb.tf             # ALB/Target Groups
+├── rds.tf             # RDS MySQL
+├── dynamodb.tf        # DynamoDB 테이블
+├── waf.tf             # WAF 정책
+├── monitoring.tf      # CloudWatch 알람
+├── outputs.tf         # 출력값
+├── user_data.sh       # ECS 인스턴스 초기화
+└── README.md          # 배포 가이드
 ```
 
 ---
