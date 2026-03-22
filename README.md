@@ -1,18 +1,18 @@
-# 🏆 Cloud Computing Skills Competition Archive
+# WorldPay 유저 관리 시스템
 
-기능경기대회(클라우드컴퓨팅 직종) 대비 및 수업 자료를 체계적으로 정리한 저장소입니다.  
-AWS 기반 인프라 설계, Terraform IaC 구성, 과제 풀이 및 설명 자료를 포함합니다.
+고가용성, 보안, 확장성을 고려한 전 세계 결제 서비스 유저 관리 시스템
 
----
+## 아키텍처 개요
 
-## 📁 Repository Structure
+- **고가용성**: Multi-AZ 배포, Auto Scaling, Load Balancer
+- **보안**: 암호화, IAM, VPC, WAF
+- **확장성**: 마이크로서비스, 컨테이너화, 서버리스
 
-```text
-.
-├── 2025_지방/        # 2025 지방기능경기대회 과제 및 풀이
-├── 2025전국/        # 2025 전국기능경기대회 과제 및 풀이
-├── 2025자료/        # 대회 대비 참고 자료 및 정리 문서
-├── AWS과제/         # AWS 과제별 Terraform 코드
-│   └── vpc.tf
-├── terraform/       # Terraform 실습 및 공통 템플릿
-└── docs/            # 설계 설명, PPT, 수업 자료 문서
+## 디렉토리 구조
+
+```
+├── src/                 # 애플리케이션 소스 코드
+├── infrastructure/      # AWS 인프라 코드 (Terraform/CloudFormation)
+├── config/             # 설정 파일들
+└── docs/               # 문서
+```
