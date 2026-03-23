@@ -1,17 +1,23 @@
-🏆 2026년도 지방기능경기대회 과제 (확장형)
-과제명
+# 🏆 2026년도 지방기능경기대회 과제 (확장형)
 
-Multi-VPC Secure Architecture 구축 (VPC Peering)
+## 📌 과제명
 
-1. 요구사항
+**Multi-VPC Secure Architecture 구축 (VPC Peering)**
+
+---
+
+# 1. 요구사항
 
 당신은 WorldPay의 유저 관리 시스템을 구축하는 업무를 수행해야 합니다.
-서비스는 고가용성, 보안성, 네트워크 분리를 강화하기 위해 2개의 VPC로 분리된 구조로 설계되어야 합니다.
+WorldPay는 전 세계 사용자들의 결제를 지원하는 서비스로, 고가용성, 보안성, 확장성을 확보해야 합니다.
 
-사용자 요청은 App VPC의 ALB를 통해 처리됩니다.
-데이터베이스는 DB VPC에 별도로 구성됩니다.
-두 VPC는 VPC Peering으로 연결됩니다.
-2. 아키텍처 개요
+본 과제에서는 **2개의 VPC로 분리된 구조**를 기반으로 AWS 환경에 인프라를 구축하고, 정상적으로 동작하는 서비스를 구현해야 합니다.
+
+---
+
+## 📌 아키텍처 개요
+
+```
 User
   ↓
 [ App VPC ]
@@ -22,65 +28,219 @@ User
           ↓
 [ DB VPC ]
   └─ RDS (Private)
+```
 
-보조 서비스:
+---
 
-Secrets Manager
-KMS
-CloudWatch
-3. 세부 요구사항
-가. VPC 구성 (2 VPC 필수)
-1) App VPC
-Name: skills-app-vpc
-CIDR: 10.0.0.0/16
-2) DB VPC
-Name: skills-db-vpc
-CIDR: 192.168.0.0/16
-나. Subnet 구성
-App VPC
-구분	Name	AZ	CIDR
-Public A	skills-app-public-a	2a	10.0.0.0/24
-Public C	skills-app-public-c	2c	10.0.1.0/24
-Private A	skills-app-private-a	2a	10.0.2.0/24
-Private C	skills-app-private-c	2c	10.0.3.0/24
-DB VPC
-구분	Name	AZ	CIDR
-Private A	skills-db-private-a	2a	192.168.0.0/24
-Private C	skills-db-private-c	2c	192.168.1.0/24
-다. VPC Peering 구성 (핵심)
-App VPC ↔ DB VPC 간 VPC Peering 생성
-양쪽 VPC Route Table에 다음 경로 추가
-App VPC Route Table
+## 📌 구성 요소
+
+* Application Load Balancer (ALB)
+* Amazon EC2
+* Amazon RDS (MySQL)
+* AWS Secrets Manager
+* AWS KMS
+* Amazon CloudWatch
+* Amazon VPC (2개)
+
+---
+
+## 📌 소프트웨어 스택
+
+* Language: Python
+* Database: MySQL
+
+---
+
+# 2. 세부 요구사항
+
+## 가. VPC 구성
+
+### App VPC
+
+* Name: `skills-app-vpc`
+* CIDR: `10.0.0.0/16`
+
+### DB VPC
+
+* Name: `skills-db-vpc`
+* CIDR: `192.168.0.0/16`
+
+---
+
+## 나. Subnet 구성
+
+### App VPC
+
+| 구분        | Name                 | AZ              | CIDR        |
+| --------- | -------------------- | --------------- | ----------- |
+| Public A  | skills-app-public-a  | ap-northeast-2a | 10.0.0.0/24 |
+| Public C  | skills-app-public-c  | ap-northeast-2c | 10.0.1.0/24 |
+| Private A | skills-app-private-a | ap-northeast-2a | 10.0.2.0/24 |
+| Private C | skills-app-private-c | ap-northeast-2c | 10.0.3.0/24 |
+
+---
+
+### DB VPC
+
+| 구분        | Name                | AZ              | CIDR           |
+| --------- | ------------------- | --------------- | -------------- |
+| Private A | skills-db-private-a | ap-northeast-2a | 192.168.0.0/24 |
+| Private C | skills-db-private-c | ap-northeast-2c | 192.168.1.0/24 |
+
+---
+
+## 다. VPC Peering
+
+* App VPC ↔ DB VPC 연결
+
+### Route 설정
+
+**App VPC**
+
+```
 192.168.0.0/16 → VPC Peering
-DB VPC Route Table
+```
+
+**DB VPC**
+
+```
 10.0.0.0/16 → VPC Peering
-라. ALB 구성
-App VPC Public Subnet 배치
-HTTP 80
-Target Group → EC2
-마. EC2 구성
-App VPC Private Subnet 배치
-DB VPC RDS에 접근 가능해야 함
-바. RDS 구성
-DB VPC Private Subnet 배치
-Multi-AZ 구성
-외부 접근 불가
-사. 보안 구성 (중요 차이)
-EC2 SG
-Inbound: 80 (ALB SG)
-Outbound: DB VPC CIDR 허용
-RDS SG
-Inbound: 3306 (App VPC CIDR: 10.0.0.0/16)
+```
 
-👉 SG에서 다른 VPC SG 참조 불가 → CIDR 기반 허용 필수
+---
 
-아. Secrets / KMS / CloudWatch
+## 라. ALB 구성
 
-기존과 동일
+* App VPC Public Subnet
+* HTTP 80
+* Target: EC2
+* Health Check: `/health`
 
-4. 구현 조건
-반드시 2개의 VPC 생성
-VPC Peering 구성 필수
-Route Table 정확히 설정
-Name Tag 정확히 일치
-Terraform 사용
+---
+
+## 마. EC2 구성
+
+* Private Subnet 배치
+* Amazon Linux 2023
+* Python Flask 실행
+
+### API
+
+| 경로        | 기능                       |
+| --------- | ------------------------ |
+| `/`       | WorldPay Service Running |
+| `/health` | OK                       |
+
+---
+
+## 바. RDS 구성
+
+* DB VPC Private Subnet
+* MySQL
+* Multi-AZ
+* DB 이름: `worldpay`
+
+---
+
+## 사. 보안 구성
+
+### ALB
+
+* 80 (0.0.0.0/0)
+
+### EC2
+
+* 80 (ALB SG)
+
+### RDS
+
+* 3306 (App VPC CIDR)
+
+---
+
+## 아. 모니터링
+
+* CloudWatch 로그 수집
+* `/health` 상태 확인
+
+---
+
+# 3. 구현 조건
+
+1. Name Tag 정확히 설정
+2. 리전: ap-northeast-2
+3. EC2: Amazon Linux 2023
+4. Terraform 사용
+5. Bastion 기반 채점 고려
+
+---
+
+# 4. 채점 기준
+
+| 항목          | 점수 |
+| ----------- | -- |
+| App VPC 구성  | 10 |
+| DB VPC 구성   | 10 |
+| VPC Peering | 15 |
+| Routing     | 15 |
+| ALB         | 10 |
+| EC2         | 10 |
+| RDS         | 10 |
+| 보안          | 10 |
+| 서비스 동작      | 10 |
+
+---
+
+# 📎 부록. 네트워크 구성 정보
+
+## VPC
+
+| Name           | CIDR           |
+| -------------- | -------------- |
+| skills-app-vpc | 10.0.0.0/16    |
+| skills-db-vpc  | 192.168.0.0/16 |
+
+---
+
+## NAT Gateway
+
+| Name       | Subnet              |
+| ---------- | ------------------- |
+| skills-nat | skills-app-public-a |
+
+---
+
+## Route Table
+
+| Name          | 경로            |
+| ------------- | ------------- |
+| skills-app-rt | IGW + Peering |
+| skills-db-rt  | Peering       |
+
+---
+
+# 🔥 핵심 포인트
+
+* VPC 2개 구성 필수
+* Peering + Routing 필수
+* SG는 CIDR 기반 설정
+* DB는 완전 분리
+
+---
+
+# 🚨 주의사항
+
+* Peering 후 Route 누락 → 감점
+* SG 참조 실수 → 감점
+* Name Tag 틀림 → 감점
+* CIDR 틀림 → 감점
+
+---
+
+# 🎯 출제 의도
+
+* Multi-VPC 설계 능력
+* 네트워크 분리 이해
+* AWS 실무 구조 구현 능력
+
+---
