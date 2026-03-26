@@ -8,23 +8,19 @@
 # ⚙️ STEP 0: 환경 설정
 
 ```bash
-# Account ID 확인
+# Account ID
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 echo "Account ID: $AWS_ACCOUNT_ID"
 
-# VPC / Subnet 환경변수
-export VPC_ID=$(aws ec2 describe-vpcs \
-  --filters "Name=isDefault,Values=true" \
-  --query 'Vpcs[0].VpcId' \
-  --output text)
+# 기본 VPC
+export VPC_ID=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" --query 'Vpcs[0].VpcId' --output text)
+echo "VPC: $VPC_ID"
 
-export SUBNET_IDS=$(aws ec2 describe-subnets \
-  --filters "Name=vpc-id,Values=$VPC_ID" \
-  --query 'Subnets[*].SubnetId' \
-  --output text)
-
-export SUBNET_ID1=$(echo $SUBNET_IDS | awk '{print $1}')
-export SUBNET_ID2=$(echo $SUBNET_IDS | awk '{print $2}')
+# 서브넷 (2개)
+export SUBNET_ID1=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0].SubnetId' --output text)
+export SUBNET_ID2=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[1].SubnetId' --output text)
+echo "Subnet1: $SUBNET_ID1"
+echo "Subnet2: $SUBNET_ID2"
 
 echo "VPC: $VPC_ID / Subnet1: $SUBNET_ID1 / Subnet2: $SUBNET_ID2"
 ```
