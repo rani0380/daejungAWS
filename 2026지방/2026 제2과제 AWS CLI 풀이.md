@@ -12,18 +12,32 @@
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
 echo "Account ID: $AWS_ACCOUNT_ID"
 
-# 기본 VPC
-export VPC_ID=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" --query 'Vpcs[0].VpcId' --output text)
+# VPC 생성
+export VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.VpcId' --output text)
+aws ec2 modify-vpc-attribute --vpc-id $VPC_ID --enable-dns-hostnames
 echo "VPC: $VPC_ID"
 
-# 서브넷 (2개)
-export SUBNET_ID1=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0].SubnetId' --output text)
-export SUBNET_ID2=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[1].SubnetId' --output text)
-echo "Subnet1: $SUBNET_ID1"
-echo "Subnet2: $SUBNET_ID2"
+# AZ 2개 확인
+export AZ1=$(aws ec2 describe-availability-zones --query 'AvailabilityZones[0].ZoneName' --output text)
+export AZ2=$(aws ec2 describe-availability-zones --query 'AvailabilityZones[1].ZoneName' --output text)
 
-echo "VPC: $VPC_ID / Subnet1: $SUBNET_ID1 / Subnet2: $SUBNET_ID2"
-```
+# 서브넷 2개 생성
+export SUBNET_ID1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.1.0/24 --availability-zone $AZ1 --query 'Subnet.SubnetId' --output text)
+export SUBNET_ID2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone $AZ2 --query 'Subnet.SubnetId' --output text)
+
+echo "Subnet1: $SUBNET_ID1 ($AZ1)"
+echo "Subnet2: $SUBNET_ID2 ($AZ2)"
+
+# 인터넷 게이트웨이 (EC2 등에서 필요)
+export IGW_ID=$(aws ec2 create-internet-gateway --query 'InternetGateway.InternetGatewayId' --output text)
+aws ec2 attach-internet-gateway --internet-gateway-id $IGW_ID --vpc-id $VPC_ID
+
+# 라우팅 테이블에 인터넷 경로 추가
+export RTB_ID=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" --query 'RouteTables[0].RouteTableId' --output text)
+aws ec2 create-route --route-table-id $RTB_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW_ID
+
+echo "IGW: $IGW_ID / RTB: $RTB_ID"
+echo "=== 환경 설정 완료 ==="
 
 ---
 
