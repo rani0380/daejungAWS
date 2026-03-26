@@ -7,8 +7,8 @@ Shared Network Storage (EFS)
 Query from S3 (Athena)
 Fine-grained IAM Policy
 MySQL with Lambda
-1️⃣ Shared Network Storage (EFS)
-📌 구조 다이어그램
+1️⃣ Shared Network Storage (EFS)\
+📌 구조 다이어그램\
         ┌────────────┐
         │   EC2 #1   │
         └─────┬──────┘
