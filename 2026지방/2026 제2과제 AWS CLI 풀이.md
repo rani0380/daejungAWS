@@ -40,6 +40,7 @@ echo "IGW: $IGW_ID / RTB: $RTB_ID"
 echo "=== 환경 설정 완료 ==="
 
 ---
+```
 
 # 1️⃣ 문제 1: EFS (5 Steps)
 
@@ -89,8 +90,40 @@ aws efs create-mount-target \
   --subnet-id $SUBNET_ID1 \
   --security-groups $EFS_SG
 ```
+# SSM 역할 생성
+aws iam create-role --role-name SSMRole \
+  --assume-role-policy-document '{
+    "Version":"2012-10-17",
+    "Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]
+  }'
+aws iam attach-role-policy --role-name SSMRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+# Instance Profile 생성 & 역할 연결
+aws iam create-instance-profile --instance-profile-name SSMInstanceProfile
+aws iam add-role-to-instance-profile --instance-profile-name SSMInstanceProfile --role-name SSMRole
+
+echo "Profile 전파 대기..."
+sleep 10
+
+# EC2 생성
+export INSTANCE_ID=$(aws ec2 run-instances \
+  --image-id $AMI_ID \
+  --instance-type t3.micro \
+  --subnet-id $SUBNET_ID1 \
+  --security-group-ids $EC2_SG $EFS_SG \
+  --associate-public-ip-address \
+  --iam-instance-profile Name=SSMInstanceProfile \
+  --user-data '#!/bin/bash
+yum install -y amazon-efs-utils
+mkdir -p /mnt/efs
+mount -t efs '"$EFS_ID"':/ /mnt/efs
+echo "hello-efs" > /mnt/efs/test.txt' \
+  --query 'Instances[0].InstanceId' --output text)
+echo "EC2: $INSTANCE_ID"
 
 ---
+
 
 ## 4) EC2에서 마운트
 
