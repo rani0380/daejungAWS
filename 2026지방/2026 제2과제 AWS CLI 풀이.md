@@ -91,6 +91,7 @@ aws efs create-mount-target \
   --security-groups $EFS_SG
 ```
 # SSM 역할 생성
+```bash
 aws iam create-role --role-name SSMRole \
   --assume-role-policy-document '{
     "Version":"2012-10-17",
@@ -98,15 +99,18 @@ aws iam create-role --role-name SSMRole \
   }'
 aws iam attach-role-policy --role-name SSMRole \
   --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-
+```
 # Instance Profile 생성 & 역할 연결
+```bash
 aws iam create-instance-profile --instance-profile-name SSMInstanceProfile
 aws iam add-role-to-instance-profile --instance-profile-name SSMInstanceProfile --role-name SSMRole
 
 echo "Profile 전파 대기..."
 sleep 10
+```
 
 # EC2 생성
+```bash
 export INSTANCE_ID=$(aws ec2 run-instances \
   --image-id $AMI_ID \
   --instance-type t3.micro \
@@ -121,8 +125,8 @@ mount -t efs '"$EFS_ID"':/ /mnt/efs
 echo "hello-efs" > /mnt/efs/test.txt' \
   --query 'Instances[0].InstanceId' --output text)
 echo "EC2: $INSTANCE_ID"
+```
 
----
 
 
 ## 4) EC2에서 마운트
