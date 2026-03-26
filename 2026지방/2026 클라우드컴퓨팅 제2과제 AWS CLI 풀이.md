@@ -8,6 +8,7 @@ Query from S3 (Athena)
 Fine-grained IAM Policy
 MySQL with Lambda
 1️⃣ Shared Network Storage (EFS)
+
 📌 구조
 EC2 #1 ──┐
          ├── EFS (NFS)
