@@ -1,0 +1,6 @@
+order_id,product_name,category,quantity,unit_price
+1001,Laptop,Electronics,1,1200.0
+1002,T-shirt,Clothing,3,20.0
+1003,Apple,Food,10,1.5
+1004,Headphones,Electronics,2,150.0
+1005,Shoes,Clothing,1,80.0
