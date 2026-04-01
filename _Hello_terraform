@@ -1,0 +1,19 @@
+# Hello Terraform 예제
+
+이 예제는 Terraform의 기본 명령어 흐름을 학습하기 위한 간단한 실습입니다. 실제 AWS 리소스를 만들지 않고도 Terraform의 작동 방식을 이해할 수 있습니다.
+
+## 📁 파일 설명
+
+- `main.tf`: `null_resource`를 사용하여 "Hello, Terraform!"을 출력하는 코드
+
+## 🧰 사전 준비
+
+- [Terraform 설치](https://developer.hashicorp.com/terraform/downloads)
+- CLI 또는 VSCode 사용
+
+## ▶️ 실행 방법
+
+1. 초기화 (필수)
+
+```bash
+terraform init
